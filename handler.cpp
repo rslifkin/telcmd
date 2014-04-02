@@ -28,6 +28,7 @@ int handlerthread()
 	int len2=strlen(tosend0);
 	send(mysocknum, (const char *)&tosend0, len2, 0);
 	int givecmd = 0;
+	//Tracking vars for invalid command handler
 	int firstloop = 1;
 	int sincerun = 0;
 	//Command interpreter loop
@@ -42,6 +43,7 @@ int handlerthread()
 			send(mysocknum, (const char *)&tosend, len2, 0);
 			givecmd = 1;
 		}
+		//Receive command
 		int numchars = recv(mysocknum, (char *)&torecv, 4999, 0); //Receive command
 		if (numchars == 0)
 			break;
@@ -49,8 +51,10 @@ int handlerthread()
 		//Process commands and execute appropriate actions
 		if(strcmp(torecv, "exit")==0)
 			break;
+		//Handler for showline command
 		else if(strcmp(torecv, "showline")==0)
 		{
+			//Disabled command handling
 			if(slinedisable==1)
 			{
 				char tosend[]={"Show Line Command is Disabled \n\r"};
@@ -66,6 +70,7 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Handler for usersay command
 		else if(strcmp(torecv, "usersay")==0)
 		{
 			if(usersaydisable==0)
@@ -85,6 +90,7 @@ int handlerthread()
 				len2=strlen(tosend2);
 				send(mysocknum, (const char *)&tosend2, len2, 0);
 			}
+			//Disabled command handling
 			else
 			{
 				char tosend[]={"Usersay Command is Disabled \n\r"};
@@ -94,6 +100,7 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Handler for giveascii command
 		else if(strcmp(torecv, "giveascii")==0)
 		{
 			if(gasciidisable==0)
@@ -119,10 +126,12 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Handler for serverbeep command
 		else if(strcmp(torecv, "serverbeep")==0)
 		{
 			if(sbeepdisable==0)
 				threadhandle2 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)sbeep, &tdata2, 0, NULL);
+			//Disabled command handling
 			else
 			{
 				char tosend[]={"Server Beep Command is Disabled \n\r"};
@@ -132,6 +141,7 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Handler for clientbeep command
 		else if(strcmp(torecv, "clientbeep")==0)
 		{
 			if(cbeepdisable==0)
@@ -140,6 +150,7 @@ int handlerthread()
 				len2=strlen(tosend);
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
+			//Disabled command handling
 			else
 			{
 				char tosend[]={"Client Beep Command is Disabled \n\r"};
@@ -149,6 +160,7 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Handler for clear command
 		else if(strcmp(torecv, "clear")==0)
 		{
 			if(clsdisable==0)
@@ -157,6 +169,7 @@ int handlerthread()
 				len2=strlen(tosend);
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
+			//Disabled command handling
 			else
 			{
 				char tosend[]={"Clear Screen Command is Disabled \n\r"};
@@ -166,6 +179,7 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Handler for cls command
 		else if(strcmp(torecv, "cls")==0)
 		{
 			if(clsdisable==0)
@@ -174,6 +188,7 @@ int handlerthread()
 				len2=strlen(tosend);
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
+			//Disabled command handling
 			else
 			{
 				char tosend[]={"Clear Screen Command is Disabled \n\r"};
@@ -183,11 +198,12 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Handler for consolematrix command
 		else if(strcmp(torecv, "consolematrix")==0)
 		{
 			if (matrixdisable == 0)
 			{
-				for(int m=0; m<500000; m++)
+				for(int m=0; m<500000; m++) //Matrix output loop
 				{
 					int randnumx=rand()%6;
 					if(randnumx==0)
@@ -226,10 +242,11 @@ int handlerthread()
 						len2=strlen(tosendx5);
 						send(mysocknum, (const char *)&tosendx5, len2, 0);
 					}
-					else
+					else //Error handling
 						cout << "Matrix Error, randnumx out of bounds" << endl;
 				}
 			}
+			//Disabled command handling
 			else
 			{
 				char tosend[]={"Matrix Command is Disabled \n\r"};
@@ -239,6 +256,7 @@ int handlerthread()
 			givecmd=0;
 			sincerun = 0;
 		}
+		//Invalid command handler
 		else
 		{
 			if (sincerun > 1 && firstloop == 0)
@@ -250,6 +268,7 @@ int handlerthread()
 				sincerun = 0;
 			}
 		}
+		//Update tracking variables for invalid command handler
 		firstloop = 0;
 		sincerun++;
 	}
