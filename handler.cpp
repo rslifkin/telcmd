@@ -265,7 +265,8 @@ int handlerthread()
 				len2 = strlen(tosend);
 				send(mysocknum, (const char *)&tosend, len2, 0);
 				givecmd = 0;
-				sincerun = 0;
+				if (numchars != 2)
+					sincerun = 0;
 			}
 		}
 		//Update tracking variables for invalid command handler
