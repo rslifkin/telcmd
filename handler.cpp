@@ -27,23 +27,25 @@ int handlerthread()
 	char tosend0[]={"Welcome to RobShell \n\r"};
 	int len2=strlen(tosend0);
 	send(mysocknum, (const char *)&tosend0, len2, 0);
-	int givecmd=0;
+	int givecmd = 0;
+	int firstloop = 1;
+	int sincerun = 0;
 	//Command interpreter loop
 	while(1)
 	{
+		char torecv[5000] = { NULL };
 		//Check if command has already been received
-		if(givecmd==0)
+		if (givecmd == 0)
 		{
-			char tosend[]={"Please enter a command: "};
-			len2=strlen(tosend);
+			char tosend[] = { "Please enter a command: " };
+			len2 = strlen(tosend);
 			send(mysocknum, (const char *)&tosend, len2, 0);
-			givecmd=1;
+			givecmd = 1;
 		}
-		char torecv[5000]={NULL};
-		int numchars=recv(mysocknum, (char *)&torecv, 4999, 0); //Receive command
-		if(numchars==0)
+		int numchars = recv(mysocknum, (char *)&torecv, 4999, 0); //Receive command
+		if (numchars == 0)
 			break;
-		torecv[numchars]='\0';
+		torecv[numchars] = '\0';
 		//Process commands and execute appropriate actions
 		if(strcmp(torecv, "exit")==0)
 			break;
@@ -62,6 +64,7 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
 		else if(strcmp(torecv, "usersay")==0)
 		{
@@ -89,6 +92,7 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
 		else if(strcmp(torecv, "giveascii")==0)
 		{
@@ -101,17 +105,19 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
 		//Command help system
 		else if(strcmp(torecv, "help")==0)
 		{
-			char tosend[]={"RobShell Help System \n\r \n\r Command List: \n\r exit \n\r showline \n\r usersay \n\r giveascii \n\r serverbeep \n\r clientbeep \n\r clear \n\r cls \n\r consolematrix \n\r \n\r"};
+			char tosend[]={"RobShell Help System \n\r \n\r Command List: \n\r exit \n\r showline \n\r usersay \n\r giveascii \n\r serverbeep \n\r clientbeep \n\r clear \n\r cls \n\r consolematrix \n\r help \n\r \n\r"};
 			len2=strlen(tosend);
 			send(mysocknum, (const char *)&tosend, len2, 0);
 			char tosend2[]={"Note: No command takes command line arguments. \n\rAny command requiring input will ask when ready.  \n\r\n\rNote2: The 'clear' and 'cls' commands are the same,\n\rthey are simply both availible for convience.  \n\r\n\r"};
 			len2=strlen(tosend2);
 			send(mysocknum, (const char *)&tosend2, len2, 0);
 			givecmd=0;
+			sincerun = 0;
 		}
 		else if(strcmp(torecv, "serverbeep")==0)
 		{
@@ -124,6 +130,7 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
 		else if(strcmp(torecv, "clientbeep")==0)
 		{
@@ -140,6 +147,7 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
 		else if(strcmp(torecv, "clear")==0)
 		{
@@ -156,6 +164,7 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
 		else if(strcmp(torecv, "cls")==0)
 		{
@@ -172,6 +181,7 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
 		else if(strcmp(torecv, "consolematrix")==0)
 		{
@@ -227,7 +237,21 @@ int handlerthread()
 				send(mysocknum, (const char *)&tosend, len2, 0);
 			}
 			givecmd=0;
+			sincerun = 0;
 		}
+		else
+		{
+			if (sincerun > 1 && firstloop == 0)
+			{
+				char tosend[] = { "Invalid Command \n\r" };
+				len2 = strlen(tosend);
+				send(mysocknum, (const char *)&tosend, len2, 0);
+				givecmd = 0;
+				sincerun = 0;
+			}
+		}
+		firstloop = 0;
+		sincerun++;
 	}
 	//Connection cleanup and session termination
 	closesocket(mysocknum);
