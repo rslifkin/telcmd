@@ -15,11 +15,11 @@ using namespace std;
 #include"vars.h" //include global variables defs
 
 //initialize global variables
-unsigned int socknum;
-unsigned int socknum2;
+volatile unsigned int socknum;
+volatile unsigned int socknum2;
 HANDLE threadhandle;
 HANDLE threadhandle2;
-int killserv;
+volatile int killserv;
 unsigned long int sessionnum;
 int matrixdisable;
 int usersaydisable;

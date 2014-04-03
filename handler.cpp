@@ -19,6 +19,9 @@ using namespace std;
 //Connection handler and command interpreter
 int handlerthread()
 {
+	//Check if this thread should be running
+	if (killserv == 1)
+		ExitThread((DWORD)0);
 	//Variables to keep track of session
 	int mysocknum=socknum2;
 	int mysessionnum=sessionnum;
@@ -78,10 +81,10 @@ int handlerthread()
 				char tosend[]={"Please Input Something To Say: "};
 				len2=strlen(tosend);
 				send(mysocknum, (const char *)&tosend, len2, 0);
-				char torecv2[5000]={NULL};
+				char torecv2[500]={NULL};
 				for(int z=0; z<2; z++)
-					recv(mysocknum, (char *)&torecv2, 4999, 0);
-				torecv2[strlen(torecv2)]='\0';
+					recv(mysocknum, (char *)&torecv2, 499, 0);
+				torecv2[499]='\0';
 				cout << "Usersay - Session " << mysessionnum << ": ";
 				for(int x=0; x<strlen(torecv2); x++)
 					cout << torecv2[x];
@@ -203,7 +206,7 @@ int handlerthread()
 		{
 			if (matrixdisable == 0)
 			{
-				for(int m=0; m<500000; m++) //Matrix output loop
+				for(int m=0; m<500000; m++) //Matrix output loopj
 				{
 					int randnumx=rand()%6;
 					if(randnumx==0)
